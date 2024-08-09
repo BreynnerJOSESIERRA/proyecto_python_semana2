@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import mysql.connector
 from mysql.connector import Error
-
+import json 
 app = Flask(__name__)
 
 def get_db_connection():
@@ -15,24 +15,22 @@ def get_db_connection():
 
 @app.route('/items', methods=['POST'])
 def create_item():
-    data = request.json
-    name = data.get("name")
-    precio = data.get("precio")
-
+    data = request.get_json()
     connection = get_db_connection()
     cursor = connection.cursor()
+    for i in data['productos']: 
+       name= i['name']
+       precio= i['precio']
+       query = "INSERT INTO item (name,precio) VALUES (%s , %s)"
+       cursor.execute(query, (name,precio))
+    return jsonify(i), 200
+    
+   
+    ##cursor = connection.cursor()
+    ##query = "INSERT INTO item (name,precio) VALUES (%s , %s)"
+    ##cursor.execute(query)
+    ##connection.commit()
 
-    query = "INSERT INTO item (name,precio) VALUES (%s , %s)"
-    val = [
-        ('peter', '15.5'),
-        ('brey', '54.5'),
-        ('ben', '45.02'),
-        ('viola', '18.2')
-    ]
-    cursor.execute(query, val)
-    connection.commit()
-
-    print(cursor.rowcount, "record inserted  sucessfully"),201
     
 @app.route('/items', methods=['GET'])
 def get_items():
