@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./app
+    container_name: flask_python
+    ports:
+      - '5000:5000'
+    depends_on:
+      - db
+    environment:
+      - FLASK_ENV=development
+    volumes: 
+      - ./app:/app
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 'brey'
+      MYSQL_DATABSE: crud_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data_:/var/lib/mysql
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:
